@@ -62,7 +62,7 @@ instance Parseable (ImportDecl SrcSpanInfo) where parser = normalParserNoFixity 
 
 normalParser :: AppFixity a => P (a SrcSpanInfo) -> Maybe [Fixity] -> P (a SrcSpanInfo)
 normalParser p Nothing = p
-normalParser p (Just fixs) = p >>= \ast -> applyFixities fixs ast `atSrcLoc` noLoc
+normalParser p (Just fixs) = p >>= \ast -> applyFixitiesP fixs ast
 
 normalParserNoFixity :: P (a SrcSpanInfo) -> Maybe [Fixity] -> P (a SrcSpanInfo)
 normalParserNoFixity p _ = p

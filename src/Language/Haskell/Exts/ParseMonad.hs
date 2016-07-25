@@ -22,7 +22,7 @@ module Language.Haskell.Exts.ParseMonad(
         ParseMode(..), defaultParseMode, fromParseResult,
         runParserWithMode, runParserWithModeComments, runParser,
         getSrcLoc, pushCurrentContext, popContext,
-        getExtensions, getIgnoreFunctionArity,
+        getExtensions, getIgnoreFunctionArity, applyFixitiesP,
         -- * Lexing
         Lex(runL), getInput, discard, getLastChar, lexNewline,
         lexTab, lexWhile, lexWhile_,
@@ -37,8 +37,9 @@ module Language.Haskell.Exts.ParseMonad(
         getModuleName
     ) where
 
-import Language.Haskell.Exts.SrcLoc (SrcLoc(..), noLoc)
-import Language.Haskell.Exts.Fixity (Fixity, preludeFixities)
+import Language.Haskell.Exts.SrcLoc (SrcLoc(..), noLoc, SrcSpanInfo)
+import Language.Haskell.Exts.Fixity (Fixity, preludeFixities, applyFixities, AppFixity
+                                    , printFixityError, fixityErrorPos)
 import Language.Haskell.Exts.Comments
 import Language.Haskell.Exts.Extension -- (Extension, impliesExts, haskell2010)
 
@@ -544,3 +545,13 @@ setLineFilenameL name = Lex $ \cont -> P $ \r x y loc ch s m ->
 pushComment :: Comment -> Lex a ()
 pushComment c = Lex $ \cont -> P $ \r x y loc ch (s, exts, e, p, cs) ->
         runP (cont ()) r x y loc ch (s, exts, e, p, c:cs)
+
+
+applyFixitiesP :: AppFixity ast => [Fixity] -> ast SrcSpanInfo -> P (ast SrcSpanInfo)
+applyFixitiesP fixs ast =
+  case applyFixities fixs ast of
+    -- Invariant, non-empty
+    Left (e:_) -> fail ("Ambiguous infix expression: " ++ printFixityError e)
+                      `atSrcLoc` fixityErrorPos e
+    Right v -> return v
+    _ -> fail ""

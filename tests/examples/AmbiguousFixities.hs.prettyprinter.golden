@@ -1,1 +1,1 @@
-ParseFailed (SrcLoc "" -1 -1) "Ambiguous infix expression"
+ParseFailed (SrcLoc "tests/examples/AmbiguousFixities.hs" 1 5) "Ambiguous infix expression: (.){r} and (&&&){l} have precedence 9"
