@@ -275,8 +275,16 @@ instance AppFixity Decl where
           in liftM3 (PatBind l) (extraFix p) (extraFix rhs) (mapM extraFix bs)
         AnnPragma l ann'         -> liftM (AnnPragma l) $ fix ann'
         PatSyn l p1 p2 dir -> liftM (PatSyn l p1 p2) (fix dir)
+        TypeSig l n ty     -> liftM (TypeSig l n) (fix ty)
         _                       -> return decl
       where fix x = applyFixitiesInternal fixs x
+
+instance AppFixity Type where
+  applyFixitiesInternal fixs ty = case ty of
+    TySplice l sp -> liftM (TySplice l) (fix sp)
+    _ -> return ty
+    where fix x = applyFixitiesInternal fixs x
+
 
 instance AppFixity PatternSynDirection where
   applyFixitiesInternal fixs dir = case dir of
