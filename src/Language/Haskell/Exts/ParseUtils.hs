@@ -57,6 +57,7 @@ module Language.Haskell.Exts.ParseUtils (
     , mkRoleAnnotDecl       --
     , mkAssocType
     , mkEThingWith
+    , mkImportSpec
     , splitTilde
     -- HaRP
     , checkRPattern         -- PExp -> P RPat
@@ -1287,3 +1288,12 @@ mkEThingWith loc qn mcns = do
     findWithIndex n p (x:xs)
       | p x = Just (n, x)
       | otherwise = findWithIndex (n + 1) p xs
+
+mkImportSpec :: ExportSpec L -> P (ImportSpec L)
+mkImportSpec e =
+  case e of
+    EVar l n -> return $ IVar l n
+    EAbs l ns n -> return $ IAbs l ns n
+    EThingWith l (EWildcard {}) qn [] -> return $ IThingAll l qn
+    EThingWith l (NoWildcard {}) qn cns  -> return $ IThingWith l qn cns
+    _  -> fail ""

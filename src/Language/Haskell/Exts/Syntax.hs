@@ -206,7 +206,7 @@ data ExportSpec l
      | EAbs l (Namespace l) (QName l)   -- ^ @T@:
                                         --   a class or datatype exported abstractly,
                                         --   or a type synonym.
-     | EThingWith l (EWildcard l) (QName l) [CName l] -- ^ @T(C_1,...,C_n)@:
+     | EThingWith l (Namespace l) (EWildcard l) (QName l) [CName l] -- ^ @T(C_1,...,C_n)@:
                                         --   a class exported with some of its methods, or
                                         --   a datatype exported with some of its constructors.
      | EModuleContents l (ModuleName l) -- ^ @module M@:
@@ -246,13 +246,13 @@ data ImportSpecList l
 -- | An import specification, representing a single explicit item imported
 --   (or hidden) from a module.
 data ImportSpec l
-     = IVar l (Name l)                  -- ^ variable
-     | IAbs l (Namespace l) (Name l)    -- ^ @T@:
+     = IVar l (QName l)                  -- ^ variable
+     | IAbs l (Namespace l) (QName l)    -- ^ @T@:
                                         --   the name of a class, datatype or type synonym.
-     | IThingAll l (Name l)             -- ^ @T(..)@:
+     | IThingAll l (Namespace l) (QName l)             -- ^ @T(..)@:
                                         --   a class imported with all of its methods, or
                                         --   a datatype imported with all of its constructors.
-     | IThingWith l (Name l) [CName l]  -- ^ @T(C_1,...,C_n)@:
+     | IThingWith l (Namespace l) (QName l) [CName l]  -- ^ @T(C_1,...,C_n)@:
                                         --   a class imported with some of its methods, or
                                         --   a datatype imported with some of its constructors.
   deriving (Eq,Ord,Show,Typeable,Data,Foldable,Traversable,Functor,Generic)
